@@ -142,7 +142,7 @@ static void popLuaSqlite(lua_State *from, sqlite3_context *ctx) {
 			break;
 
 		default:
-			sqlite3_result_null(ctx);
+			sqlite3_result_error(ctx, "Unsupported return type", -1);
 			break;
 	}
 
