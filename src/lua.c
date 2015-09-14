@@ -107,7 +107,7 @@ static void pushSqliteLua(int i, sqlite3_value *value, lua_State *destination) {
 //
 
 static void popLuaSqlite(lua_State *from, sqlite3_context *ctx) {
-	int n, t;
+	int n;
 	double d;
 	const char *str;
 
@@ -272,7 +272,6 @@ static void sql_scalar_lua(sqlite3_context *ctx, int num_values, sqlite3_value *
 //
 
 static void sql_aggregate_lua(sqlite3_context *ctx, int num_values, sqlite3_value **values) {
-	int i;
 	lua_State *L;
 	int *notFirstTime = sqlite3_aggregate_context(ctx, sizeof(int));
 
@@ -387,11 +386,14 @@ static void sql_createlua(sqlite3_context *ctx, int num_values, sqlite3_value **
 //
 // plugin main
 //
-
+#ifdef _WIN32
+__declspec(dllexport)
+#endif
 int sqlite3_extension_init(sqlite3 *db, char **error, const sqlite3_api_routines *api) {
+	lua_State *mainState; // going to hold the list of created functions
+
 	SQLITE_EXTENSION_INIT2(api);
 
-	lua_State *mainState; // going to hold the list of created functions
 
 	mainState = createLuaState();
 	if (mainState == NULL) return 0;
