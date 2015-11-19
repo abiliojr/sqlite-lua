@@ -58,23 +58,23 @@ SELECT createlua('gmean',
 And now, used on a query:
 
 ```
-CREATE TABLE data(values NUMERIC);
-INSERT INTO data(values) VALUES (2), (4), (8);
+CREATE TABLE data(val NUMERIC);
+INSERT INTO data(val) VALUES (2), (4), (8);
 
-SELECT gmean(values) FROM data; -- should return 4
+SELECT gmean(val) FROM data; -- should return 4
 ```
 
 
 # Parameters
 
-Parameters supplied to the functions can be accessed from within Lua. The array: ```arg[i]``` contains the values (1 <= i <= n). 
+Parameters supplied to the functions can be accessed from within Lua. The array: ```arg[i]``` contains the values. ```arg``` is a zero-based array (1 <= i <= n), like is customary in Lua.
 
 Example:
 ```
 -- this is a pattern matching example using Lua's internal function
-SELECT createlua('match', 'return string.match(arg[1], arg[2]');
+SELECT createlua('regex', 'return string.match(arg[1], arg[2]');
 
-SELECT match('abc 24 ef', '([0-9]+)'); -- Should return 24
+SELECT regex('abc 24 ef', '([0-9]+)'); -- Should return 24
 ```
 
 
@@ -82,15 +82,15 @@ SELECT match('abc 24 ef', '([0-9]+)'); -- Should return 24
 
 * Functions must always return a value. For aggregates, this is only performed on the final step.
 * You can redefine a function at any time by calling ```createlua``` again. This holds true even for SQLite's native functions.
-* Currently, there are no known ways of returning an array into SQLite.
+* Currently, you can't return an array into SQLite.
 * Even when Lua can return multiple values simultaneously, only the first one will be passed back to SQLite.
 
 
 # Building
 
-On FreeBSD, you must have ```lua5.2```and ```sqlite3``` installed. For Linux (Ubuntu flavored), the equivalents are ```liblua5.2-dev``` and ```libsqlite3-dev```. The library names and their locations could be different on other Operating Systems. If that's the case, edit the Makefile.
+On FreeBSD, you must have ```lua5.2```and ```sqlite3``` installed. For Linux (Ubuntu flavored), the equivalents are ```liblua5.2-dev``` and ```libsqlite3-dev```. The library names and their locations could be different on other Operating Systems. If that's the case, you may need to edit the Makefile.
 
-On Windows, you can use the provided lua.mak. You'll need to extract the Lua src directory content in a folder named lua. Also the files sqlite3.h and sqlite3ext.h, must be extracted inside a folder named sqlite. These files are part of the sqlite source amalgamation. Afterwards, you can compile the dll like this:
+On Windows, using Visual Studio, you can use the provided ```lua.mak```. You'll need to extract the Lua src directory content in a folder named lua. Also the files sqlite3.h and sqlite3ext.h, must be extracted inside a folder named sqlite. These files are part of the [sqlite source code amalgamation](https://www.sqlite.org/download.html). Afterwards, you can compile the dll like this:
 ```
 nmake -f lua.mak
 ```
@@ -102,9 +102,9 @@ This code should remain compatible with future versions of Lua. You'll only need
 
 To use this plugin from within the sqlite3 command line tool, you must run:
 
-```.load path-to-plugin/lua``` (Seems like SQLite needs the path if the library is not on LD_LIBRARY_PATH. Current directory '.' is a valid path, ie: ```.load ./lua```).
+```.load path-to-plugin/lua``` (for security reasons, SQLite needs you to provide the library path if the plugin is not located inside ```LD_LIBRARY_PATH```. Current directory '.' is a valid path, e.g., ```.load ./lua```).
 
-You could also use this from within any code that uses sqlite3 as a library. Refer to SQLite website to get more information about ```sqlite3_load_extension``` and ```sqlite3_enable_load_extension``` or look for their equivalents in your language bindings' documentation.
+You could also use this from within almost any code that uses sqlite3 as a library. Refer to SQLite website to get more information about ```sqlite3_load_extension``` and ```sqlite3_enable_load_extension``` or look for their equivalents in your language bindings' documentation.
 
 
 ## License
