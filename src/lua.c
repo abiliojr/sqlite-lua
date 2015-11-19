@@ -102,7 +102,7 @@ static void pushSqliteLua(int i, sqlite3_value *value, lua_State *destination) {
 
 
 //
-// Gets a Lua value from the stack and returns it as an SQLite value.
+// Gets a value from the Lua stack and returns it as an SQLite value.
 // Tries to match the types
 //
 
@@ -156,7 +156,7 @@ static lua_State *getAssociatedLuaState(sqlite3_context *ctx) {
 
 
 //
-// Loads a Lua chunk into the stack
+// Loads a code chunk into the Lua stack
 //
 
 static void pushLuaChunk(lua_State *where, const unsigned char *code, const unsigned char *init,
@@ -174,7 +174,7 @@ static void pushLuaChunk(lua_State *where, const unsigned char *code, const unsi
 
 
 //
-// Loads the passed values inside arg[] and executes the related Lua chunk
+// Loads the passed values inside arg[]
 //
 
 static void pushLuaParams(lua_State *where, int num_values, sqlite3_value **values) {
@@ -191,14 +191,13 @@ static void pushLuaParams(lua_State *where, int num_values, sqlite3_value **valu
 
 
 //
-// Executes Lua chunk previously stored in the stack
+// Executes code chunk previously stored in the Lua stack
 //
 
 static void executeLuaChunk(lua_State *where, int returnsValue, int chunk) {
 	lua_pushvalue(where, chunk);
 	lua_pcall(where, 0, returnsValue, 0);
 }
-
 
 
 //
@@ -215,7 +214,7 @@ static int checkStackLen(lua_State *stack, sqlite3_context *ctx, int validLen) {
 }
 
 //
-// Store a pointer into a Lua table located at the bottom of a stack
+// Store a pointer into a Lua table located at pos
 //
 
 static void storePointer(lua_State *where, int pos, const char *name, void *p) {
@@ -226,7 +225,7 @@ static void storePointer(lua_State *where, int pos, const char *name, void *p) {
 
 
 //
-// Find a pointer inside a Lua table located at the bottom of a stack
+// Find a pointer inside a Lua table located at pos
 //
 
 static lua_State *findPointer(lua_State *where, int pos, const char *name) {
@@ -254,7 +253,7 @@ static lua_State *findPointer(lua_State *where, int pos, const char *name) {
 
 
 //
-// Executes scalar Lua function (called by SQLite)
+// Executes scalar function (called by SQLite)
 //
 
 static void sql_scalar_lua(sqlite3_context *ctx, int num_values, sqlite3_value **values) {
@@ -268,7 +267,7 @@ static void sql_scalar_lua(sqlite3_context *ctx, int num_values, sqlite3_value *
 
 
 //
-// Executes init and step parts of a Lua aggregate function (called by SQLite)
+// Executes init and step parts of an aggregate function (called by SQLite)
 //
 
 static void sql_aggregate_lua(sqlite3_context *ctx, int num_values, sqlite3_value **values) {
@@ -294,7 +293,7 @@ static void sql_aggregate_lua(sqlite3_context *ctx, int num_values, sqlite3_valu
 
 
 //
-// Executes the final chunk of an aggregate function (called by SQLite)
+// Executes the final code chunk of an aggregate function (called by SQLite)
 //
 
 static void sql_aggregate_lua_final(sqlite3_context *ctx) {
@@ -308,7 +307,7 @@ static void sql_aggregate_lua_final(sqlite3_context *ctx) {
 
 
 //
-// Check that all the Lua function creation parameters are strings
+// Check that all the function creation parameters are strings
 //
 
 static const char *checkCreateluaParameters(int num_values, sqlite3_value **values) {
