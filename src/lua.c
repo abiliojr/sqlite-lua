@@ -383,6 +383,44 @@ static void sql_createlua(sqlite3_context *ctx, int num_values, sqlite3_value **
 
 
 //
+// Load data from a file (return a text or a blob)
+//
+
+static void sql_loadFile(sqlite3_context *ctx, int num_values, sqlite3_value **values) {
+	FILE *f;
+	char *buffer = 0;
+	int length;
+
+	f = fopen(sqlite3_value_text(values[0]), "rb");
+
+	if (!f) {
+		sqlite3_result_error(ctx, "Unable to open the file", -1);
+		return;
+	}
+
+	fseek(f, 0, SEEK_END);
+	length = ftell(f);
+	fseek(f, 0, SEEK_SET);
+
+	buffer = sqlite3_malloc(length + 1);
+
+	if (buffer) {
+		fread(buffer, 1, length, f);
+		
+		if (num_values == 2 && sqlite3_value_text(values[1])[0] == 'b') {
+			sqlite3_result_blob(ctx, buffer, length, sqlite3_free);
+		} else {
+			sqlite3_result_text(ctx, buffer, length, sqlite3_free);
+		}
+	} else {
+		sqlite3_result_error(ctx, "unable to get free memory to hold the file contents", -1);
+	}
+
+	fclose (f);
+}
+
+
+//
 // plugin main
 //
 #ifdef _WIN32
@@ -402,6 +440,11 @@ int sqlite3_extension_init(sqlite3 *db, char **error, const sqlite3_api_routines
 		NULL, NULL, NULL);
 	sqlite3_create_function_v2(db, "createlua", 4, SQLITE_UTF8, mainState, sql_createlua,
 		NULL, NULL, destroyLuaState);
+
+	sqlite3_create_function_v2(db, "loadfile", 1, SQLITE_UTF8, NULL, sql_loadFile,
+		NULL, NULL, NULL);
+	sqlite3_create_function_v2(db, "loadfile", 2, SQLITE_UTF8, NULL, sql_loadFile,
+		NULL, NULL, NULL);
 
 	return SQLITE_OK;
 }

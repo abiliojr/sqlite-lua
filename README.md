@@ -78,6 +78,23 @@ SELECT regex('abc 24 ef', '([0-9]+)'); -- Should return 24
 ```
 
 
+# Reading from files
+
+You can use the auxiliary function named ```loadfile``` to get the content of a file. This is useful to declare long functions. The signature is:
+
+```
+loadfile(filename,[type])
+```
+
+For example, to create a function which source code is stored in a file named ```longcode.js```, do:
+
+```
+select createjs('longcode', select loadfile('longcode.js'));
+```
+
+```loadfile``` can take an optional type parameter. If type is 'b', the file content will be read as a blob. This can be useful for other applications, e.g., reading binary files inside the database.
+
+
 # Notes
 
 * Functions must always return a value. For aggregates, this is only performed on the final step.
