@@ -86,10 +86,10 @@ You can use the auxiliary function named ```loadfile``` to get the content of a 
 loadfile(filename,[type])
 ```
 
-For example, to create a function which source code is stored in a file named ```longcode.js```, do:
+For example, to create a function which source code is stored in a file named ```longcode.lua```, do:
 
 ```
-select createjs('longcode', select loadfile('longcode.js'));
+select createlua('longcode', select loadfile('longcode.lua'));
 ```
 
 ```loadfile``` can take an optional type parameter. If type is 'b', the file content will be read as a blob. This can be useful for other applications, e.g., reading binary files inside the database.
