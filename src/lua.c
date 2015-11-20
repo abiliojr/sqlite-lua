@@ -159,17 +159,19 @@ static lua_State *getAssociatedLuaState(sqlite3_context *ctx) {
 // Loads a code chunk into the Lua stack
 //
 
-static void pushLuaChunk(lua_State *where, const unsigned char *code, const unsigned char *init,
+static int pushLuaChunk(lua_State *where, const unsigned char *code, const unsigned char *init,
 	const unsigned char *final) {
 	
 	lua_pop(where, lua_gettop(where)); // clean the stack
 
-	luaL_loadstring(where, (char *) code);
+	if (luaL_loadstring(where, (char *) code) != LUA_OK) return 1;
 
 	if (init != NULL && final != NULL) {
-		luaL_loadstring(where, (char *) init);
-		luaL_loadstring(where, (char *) final);
+		if (luaL_loadstring(where, (char *) init) != LUA_OK) return 2;
+		if (luaL_loadstring(where, (char *) final) != LUA_OK) return 3;
 	}
+
+	return 0;
 }
 
 
@@ -332,6 +334,35 @@ static const char *checkCreateluaParameters(int num_values, sqlite3_value **valu
 
 
 //
+// check result of code compilation and print a human readable result
+//
+
+static void messageCodeCompilingResult(sqlite3_context *ctx, int res, int num_values) {
+	switch (res) {
+		case 0:
+			sqlite3_result_text(ctx, "ok", -1, SQLITE_TRANSIENT);
+			break;
+
+		case 1:
+			if (num_values == 2) {
+				sqlite3_result_error(ctx, "compilation problem, please check source code", -1);
+			} else {
+				sqlite3_result_error(ctx, "compilation problem, please check step source code", -1);
+			}
+			break;
+
+		case 2:
+			sqlite3_result_error(ctx, "compilation problem, please check init source code", -1);
+			break;
+
+		case 3:
+			sqlite3_result_error(ctx, "compilation problem, please check final source code", -1);
+			break;
+	}
+}
+
+
+//
 // Create a new SQL Lua function (called by SQLite)
 //
 
@@ -339,6 +370,7 @@ static void sql_createlua(sqlite3_context *ctx, int num_values, sqlite3_value **
 	lua_State *L, *functionTable;
 
 	const char *msg, *name;
+	int retVal;
 
 	msg = checkCreateluaParameters(num_values, values);
 	if (msg != NULL) {
@@ -371,14 +403,19 @@ static void sql_createlua(sqlite3_context *ctx, int num_values, sqlite3_value **
 	// load the code inside the stack
 	if (num_values == 2) {
 		// scalar
-		pushLuaChunk(L, sqlite3_value_text(values[1]), NULL, NULL);
+		retVal = pushLuaChunk(L, sqlite3_value_text(values[1]), NULL, NULL);
 	} else {
 		// aggregate
-		pushLuaChunk(L, sqlite3_value_text(values[2]), sqlite3_value_text(values[1]),
+		retVal = pushLuaChunk(L, sqlite3_value_text(values[2]), sqlite3_value_text(values[1]),
 			sqlite3_value_text(values[3]));
 	}
 
-	sqlite3_result_text(ctx, "ok", -1, SQLITE_TRANSIENT);
+	if (retVal != 0) {
+		sqlite3_create_function_v2(sqlite3_context_db_handle(ctx), (char *) name, -1,
+			SQLITE_UTF8, NULL, NULL, NULL, NULL, NULL);
+	}
+
+	messageCodeCompilingResult(ctx, retVal, num_values);
 }
 
 
