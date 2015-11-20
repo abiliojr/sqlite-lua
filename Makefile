@@ -1,14 +1,14 @@
-# To build this on FreeBSD install lua5.2 and sqlite3
+# To build this on FreeBSD install lua5.3 (or similar) and sqlite3
 #
 # on Linux you must install:
-# 	liblua5.2-dev or similar
+# 	liblua5.3-dev or similar
 #	libsqlite3-dev or similar 
 
-LUA_VERSION=5.2
+LUA_VERSION=5.3
 
 # next 3 lines where tested on FreeBSD and Ubuntu
-LUA_CFLAGS=`pkg-config --cflags --silence-errors lua$(LUA_VERSION) || pkg-config --cflags --silence-errors lua-$(LUA_VERSION)`
-LUA_LIB=`pkg-config --libs --silence-errors lua$(LUA_VERSION) || pkg-config --libs --silence-errors lua-$(LUA_VERSION)`
+LUA_CFLAGS=`pkg-config --cflags --silence-errors lua$(LUA_VERSION) || pkg-config --cflags --silence-errors lua-$(LUA_VERSION) || pkg-config --cflags --silence-errors lua`
+LUA_LIB=`pkg-config --libs --silence-errors lua$(LUA_VERSION) || pkg-config --libs --silence-errors lua-$(LUA_VERSION) || pkg-config --libs --silence-errors lua`
 SQLITE_FLAGS=`pkg-config --cflags --silence-errors sqlite3`
 
 all: lua.so
