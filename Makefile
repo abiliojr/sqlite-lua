@@ -14,7 +14,7 @@ SQLITE_FLAGS=`pkg-config --cflags --silence-errors sqlite3`
 all: lua.so
 
 lua.so: lua.o
-	ld -shared -o lua.so lua.o $(LUA_LIB)
+	cc -shared -o lua.so lua.o $(LUA_LIB)
 
 lua.o: src/lua.c
 	cc -c $(LUA_CFLAGS) $(SQLITE_FLAGS) -O3 src/lua.c
