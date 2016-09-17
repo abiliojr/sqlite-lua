@@ -105,14 +105,14 @@ select createlua('longcode', select loadfile('longcode.lua'));
 
 # Building
 
-On FreeBSD, you must have ```lua5.2```and ```sqlite3``` installed. For Linux (Ubuntu flavored), the equivalents are ```liblua5.2-dev``` and ```libsqlite3-dev```. The library names and their locations could be different on other Operating Systems. If that's the case, you may need to edit the Makefile.
+On FreeBSD, you must have ```lua5.3```and ```sqlite3``` installed. For Linux (Ubuntu flavored), the equivalents are ```liblua5.3-dev``` and ```libsqlite3-dev```. The library names and their locations could be different on other Operating Systems. If that's the case, you may need to edit the Makefile.
 
 On Windows, using Visual Studio, you can use the provided ```lua.mak```. You'll need to extract the Lua src directory content in a folder named lua. Also the files sqlite3.h and sqlite3ext.h, must be extracted inside a folder named sqlite. These files are part of the [sqlite source code amalgamation](https://www.sqlite.org/download.html). Afterwards, you can compile the dll like this:
 ```
 nmake -f lua.mak
 ```
 
-This code should remain compatible with future versions of Lua. You'll only need to alter the ```LUA_VERSION``` parameter inside the Makefile.
+This code should remain compatible with future versions of Lua. It has also been tested with Lua 5.2. You'll only need to alter the ```LUA_VERSION``` parameter inside the Makefile.
 
 
 # Loading
