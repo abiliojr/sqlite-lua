@@ -428,7 +428,7 @@ static void sql_loadFile(sqlite3_context *ctx, int num_values, sqlite3_value **v
 	char *buffer = 0;
 	int length;
 
-	f = fopen(sqlite3_value_text(values[0]), "rb");
+	f = fopen((const char*)sqlite3_value_text(values[0]), "rb");
 
 	if (!f) {
 		sqlite3_result_error(ctx, "Unable to open the file", -1);
