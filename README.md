@@ -72,7 +72,7 @@ Parameters supplied to the functions can be accessed from within Lua. The array:
 Example:
 ```
 -- this is a pattern matching example using Lua's internal function
-SELECT createlua('regex', 'return string.match(arg[1], arg[2]');
+SELECT createlua('regex', 'return string.match(arg[1], arg[2])');
 
 SELECT regex('abc 24 ef', '([0-9]+)'); -- Should return 24
 ```
