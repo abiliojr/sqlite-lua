@@ -16,10 +16,10 @@ all: lua.so
 
 lua.so: lua.o
 	cc -shared -o lua.so lua.o $(LUA_LIB)
-	@[ "`uname -s`" == "Darwin" ] && mv lua.so lua.dylib || :
+	# @[ "`uname -s`" == "Darwin" ] && mv lua.so lua.dylib || :
 
 lua.o: src/lua.c
-	cc -c $(LUA_CFLAGS) $(SQLITE_FLAGS) -O3 src/lua.c
-	
+	cc -fPIC -c $(LUA_CFLAGS) $(SQLITE_FLAGS) -O3 src/lua.c
+
 clean:
 	rm lua.o
